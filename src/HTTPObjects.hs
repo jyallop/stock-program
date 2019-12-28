@@ -9,7 +9,7 @@ import qualified System.Logger as Logger
 import Data.ByteString
 
 getMostRecentInfo :: ByteString -> ByteString -> IO [(String, Info)]
-getMostRecentInfo symbol series = do
+getMostRecentInfo series symbol = do
   logger <- Logger.new (Logger.setOutput Logger.StdOut Logger.defSettings)
   request' <- parseRequest "GET https://www.alphavantage.co"
   let request
