@@ -44,7 +44,6 @@ executable stock-program
   build-depends:       base >=4.7 && <5
                      , parseargs
                      , stock-program  
-                     , bytestring
                      , cql
                      , yaml
                      , cql-io
