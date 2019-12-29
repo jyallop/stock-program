@@ -7,15 +7,17 @@ import Data.Aeson
 import Network.HTTP.Simple
 import qualified System.Logger as Logger
 import Data.ByteString
+import qualified Data.Text as T
+import Data.Text.Encoding (encodeUtf8)
 
-getMostRecentInfo :: ByteString -> ByteString -> IO [(String, Info)]
+getMostRecentInfo :: String -> String -> IO (String, Info)
 getMostRecentInfo series symbol = do
   logger <- Logger.new (Logger.setOutput Logger.StdOut Logger.defSettings)
   request' <- parseRequest "GET https://www.alphavantage.co"
   let request
           = setRequestMethod "GET"
           $ setRequestPath "/query"
-          $ setRequestQueryString [("function", Just series), ("symbol", Just symbol), ("apikey",Just "GB563O12AR9KLWXD")]
+          $ setRequestQueryString [("function", Just (packStr series)), ("symbol", Just (packStr symbol)), ("apikey",Just "GB563O12AR9KLWXD")]
           $ setRequestSecure True
           $ request'
 
@@ -27,11 +29,14 @@ getMostRecentInfo series symbol = do
   let info = getTimeSeries $ pullOutResponse body
   Logger.flush logger
   Logger.close logger
-  return $ toDescList info
+  return $ Prelude.head $ toDescList info
 
 pullOutResponse :: Result Resp -> Resp
 pullOutResponse (Success x) = x
 pullOutResponse (Error x) = error x
+
+packStr :: String -> ByteString
+packStr = encodeUtf8 . T.pack
 
 data Resp = Resp {
   metaData :: Object,
